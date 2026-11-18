@@ -10,7 +10,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Resolve repository root so .env and storage/ work identically regardless of CWD
 _REPO_ROOT = Path(__file__).resolve().parents[3]
-_DEFAULT_STORAGE = os.getenv("STORAGE_PATH", (_REPO_ROOT / "storage").as_posix())
+_DEFAULT_STORAGE = os.getenv(
+    "STORAGE_PATH",
+    "/tmp/interview_copilot_storage" if os.getenv("VERCEL") else (_REPO_ROOT / "storage").as_posix(),
+)
 _DEFAULT_DB_URL = f"sqlite+aiosqlite:///{(Path(_DEFAULT_STORAGE) / 'interview_copilot.db').as_posix()}"
 
 

@@ -21,7 +21,11 @@ import {
   MockPerformanceSummary,
 } from '@/types';
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_SAME_ORIGIN === 'true'
+    ? ''
+    : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+).replace(/\/+$/, '');
 
 class ApiClient {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {

@@ -6,6 +6,13 @@ import { DetectedQuestion, GeneratedAnswer, TranscriptSegment } from '@/types';
 function resolveWsBaseUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_WS_URL?.trim();
   if (explicit) return explicit.replace(/\/+$/, '');
+  if (process.env.NEXT_PUBLIC_SAME_ORIGIN === 'true') {
+    if (typeof window !== 'undefined') {
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return `${proto}//${window.location.host}`;
+    }
+    return '';
+  }
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
   if (apiUrl) {
     return apiUrl
@@ -15,8 +22,6 @@ function resolveWsBaseUrl(): string {
   }
   return 'ws://localhost:8000';
 }
-
-const WS_BASE_URL = resolveWsBaseUrl();
 
 export type WsConnectionStatus = 'connecting' | 'connected' | 'reconnecting' | 'disconnected';
 
@@ -123,7 +128,7 @@ export function useSessionWebSocket({
       if (cancelled) return;
       setWsStatus(reconnectAttempt > 0 ? 'reconnecting' : 'connecting');
 
-      const ws = new WebSocket(`${WS_BASE_URL}/ws/session/${sessionId}`);
+      const ws = new WebSocket(`${resolveWsBaseUrl()}/ws/session/${sessionId}`);
       sessionWsRef.current = ws;
 
       ws.onopen = () => {
@@ -270,7 +275,7 @@ export function useSessionWebSocket({
       if (cancelled) return;
       setAudioWsStatus(reconnectAttempt > 0 ? 'reconnecting' : 'connecting');
 
-      const ws = new WebSocket(`${WS_BASE_URL}/ws/audio/${sessionId}`);
+      const ws = new WebSocket(`${resolveWsBaseUrl()}/ws/audio/${sessionId}`);
       ws.binaryType = 'arraybuffer';
       audioWsRef.current = ws;
 
