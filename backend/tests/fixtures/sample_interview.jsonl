@@ -1,0 +1,19 @@
+{"id": 1, "source": "tab", "text": "Hello, good morning! Nice to meet you.", "label": "small_talk", "expect_detect": false}
+{"id": 2, "source": "tab", "text": "Can you hear me okay?", "label": "small_talk", "expect_detect": false}
+{"id": 3, "source": "tab", "text": "Tell me about yourself.", "label": "question", "expect_detect": true, "expect_type": "indirect"}
+{"id": 4, "source": "tab", "text": "Okay, sounds good.", "label": "small_talk", "expect_detect": false}
+{"id": 5, "source": "tab", "text": "Explain the difference between authentication and authorization.", "label": "question", "expect_detect": true, "expect_type": "technical"}
+{"id": 6, "source": "tab", "text": "What is SQL injection?", "label": "question", "expect_detect": true, "expect_type": "technical"}
+{"id": 7, "source": "tab", "text": "What is SQL injection?", "label": "duplicate", "expect_detect": false}
+{"id": 8, "source": "tab", "text": "Explain the SAP authorization concept.", "label": "question", "expect_detect": true, "expect_type": "technical"}
+{"id": 9, "source": "tab", "text": "What is the difference between OTBI and BI Publisher?", "label": "question", "expect_detect": true, "expect_type": "technical"}
+{"id": 10, "source": "tab", "text": "Great, let's move on.", "label": "small_talk", "expect_detect": false}
+{"id": 11, "source": "tab", "text": "Explain your previous project.", "label": "question", "expect_detect": true, "expect_type": "indirect"}
+{"id": 12, "source": "mic", "text": "In my previous project, I built an API gateway with FastAPI and JWT role-based access control.", "label": "candidate_answer", "expect_detect": false}
+{"id": 13, "source": "tab", "text": "Can you explain how you handled that in your project?", "label": "followup", "expect_detect": true, "expect_type": "followup"}
+{"id": 14, "source": "tab", "text": "And can you elaborate on that?", "label": "followup", "expect_detect": true, "expect_type": "followup"}
+{"id": 15, "source": "tab", "text": "How would you troubleshoot an application security issue?", "label": "question", "expect_detect": true, "expect_type": "technical"}
+{"id": 16, "source": "tab", "text": "Could you...", "label": "fragment", "expect_detect": false}
+{"id": 17, "source": "tab", "text": "walk me through how you secure REST APIs against OWASP top ten?", "label": "merged_question", "expect_detect": true, "expect_type": "technical"}
+{"id": 18, "source": "tab", "text": "Can you see my screen?", "label": "small_talk", "expect_detect": false}
+{"id": 19, "source": "tab", "text": "Alright, thanks for your time today.", "label": "small_talk", "expect_detect": false}
