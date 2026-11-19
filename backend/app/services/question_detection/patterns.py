@@ -67,3 +67,16 @@ INCOMPLETE_ENDINGS = re.compile(
 FRAGMENT_ONLY_PATTERNS = [
     re.compile(r"^(so|and|well|um|uh|can you|could you|would you|what is|what are|how do|how would|tell me|explain)[,.\s…]*$", re.I),
 ]
+
+# Substantive conversational interview cues (scenarios, constraints, pushback, topic pivots)
+# Used when conversation_mode=True so the AI replies to ongoing dialogue, not only formal questions.
+CONVERSATION_CUE_PATTERNS = [
+    re.compile(r"\b(imagine|suppose|assume|let'?s say|consider a scenario|for example we have|picture this)\b", re.I),
+    re.compile(r"\b(in our (system|production|architecture|team|company|environment|setup|stack))\b", re.I),
+    re.compile(r"\b(we (are seeing|had an outage|have a problem|don'?t use|cannot use|can'?t use|switched to|migrated to|need to|want to|use))\b", re.I),
+    re.compile(r"\b(the (constraint|challenge|issue|problem|bottleneck|requirement|trade-?off) (here )?is)\b", re.I),
+    re.compile(r"\b(actually[,\s]|however[,\s]|on the other hand|the catch is|keep in mind|one thing to note)\b", re.I),
+    re.compile(r"\b(i'?m not sure (that|if|whether)|that might not|wouldn'?t that|doesn'?t that|my concern is)\b", re.I),
+    re.compile(r"\b(let'?s (move on to|switch to|dive into|focus on|look at|design|build|debug|solve))\b", re.I),
+    re.compile(r"\b(your thoughts on|i'?d love to hear|curious to hear|interesting[,\s]+we)\b", re.I),
+]

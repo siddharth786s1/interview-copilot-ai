@@ -28,6 +28,7 @@ class AppSettings(SQLModel, table=True):
     retention_days: Optional[int] = Field(default=None)
     # Gemini Answer Structure & Coaching Profile
     structured_output: bool = Field(default=True)
+    conversation_mode: bool = Field(default=True)  # Reply to full conversation turns, not only formal questions
     target_role: str = Field(default="")
     custom_instructions: str = Field(default="", sa_column=Column(Text))
     few_shot_examples: Optional[str] = Field(default=None, sa_column=Column(Text))  # JSON list[{question, ideal_answer}]

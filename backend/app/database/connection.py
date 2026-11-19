@@ -47,6 +47,7 @@ async def init_db() -> None:
         existing_cols = {row[1] for row in cols_res.fetchall()}
         additive_columns = [
             ("structured_output", "BOOLEAN NOT NULL DEFAULT 1"),
+            ("conversation_mode", "BOOLEAN NOT NULL DEFAULT 1"),
             ("target_role", "VARCHAR NOT NULL DEFAULT ''"),
             ("custom_instructions", "TEXT NOT NULL DEFAULT ''"),
             ("few_shot_examples", "TEXT"),

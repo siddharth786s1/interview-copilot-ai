@@ -204,21 +204,32 @@ export default function SettingsPage() {
             <div>
               <h2 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-emerald-400" />
-                <span>Gemini Structured Answers & Coaching Profile</span>
+                <span>Gemini Conversational Co-pilot & Coaching Profile</span>
               </h2>
               <p className="text-[11px] text-zinc-400 mt-0.5">
-                Train Gemini to consistently return scannable, structured interview answers tailored to your role and preferred style.
+                Train Gemini to listen continuously, responding to scenarios and discussion points with structured, role-tailored answers.
               </p>
             </div>
-            <label className="inline-flex items-center gap-2 cursor-pointer text-xs text-zinc-200 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800">
-              <input
-                type="checkbox"
-                checked={settings.structured_output ?? true}
-                onChange={(e) => setSettings({ ...settings, structured_output: e.target.checked })}
-                className="accent-emerald-500 h-3.5 w-3.5"
-              />
-              <span className="font-medium">Structured Format</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <label className="inline-flex items-center gap-2 cursor-pointer text-xs text-zinc-200 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-zinc-700">
+                <input
+                  type="checkbox"
+                  checked={settings.conversation_mode ?? true}
+                  onChange={(e) => setSettings({ ...settings, conversation_mode: e.target.checked })}
+                  className="accent-indigo-500 h-3.5 w-3.5"
+                />
+                <span className="font-medium text-indigo-300">Conversational Mode</span>
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer text-xs text-zinc-200 bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-zinc-700">
+                <input
+                  type="checkbox"
+                  checked={settings.structured_output ?? true}
+                  onChange={(e) => setSettings({ ...settings, structured_output: e.target.checked })}
+                  className="accent-emerald-500 h-3.5 w-3.5"
+                />
+                <span className="font-medium">Structured Format</span>
+              </label>
+            </div>
           </div>
 
           <div className="space-y-4">

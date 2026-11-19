@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
+from app.api.websockets.manager import ws_manager
 from app.database.connection import get_session
 from app.models.settings import AppSettings
 from app.schemas.settings import FewShotExample, SettingsResponse, SettingsUpdate
@@ -44,6 +45,7 @@ def _to_response(row: AppSettings) -> SettingsResponse:
         theme=row.theme,
         retention_days=row.retention_days,
         structured_output=row.structured_output,
+        conversation_mode=row.conversation_mode,
         target_role=row.target_role or "",
         custom_instructions=row.custom_instructions or "",
         few_shot_examples=_parse_examples(row.few_shot_examples),
@@ -82,5 +84,7 @@ async def update_settings(payload: SettingsUpdate, db: AsyncSession = Depends(ge
     db.add(settings_row)
     await db.commit()
     await db.refresh(settings_row)
+    if "conversation_mode" in update_data:
+        ws_manager.set_conversation_mode_all(bool(settings_row.conversation_mode))
     logger.info("Settings updated: %s", list(update_data.keys()))
     return _to_response(settings_row)

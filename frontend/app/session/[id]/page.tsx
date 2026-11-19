@@ -811,6 +811,8 @@ export default function SessionWorkspacePage() {
                         className={`px-1.5 py-0.5 rounded font-mono uppercase ${
                           q.question_type === 'screen'
                             ? 'bg-cyan-950/70 text-cyan-300 border border-cyan-800/60'
+                            : q.question_type === 'conversation'
+                            ? 'bg-purple-950/70 text-purple-300 border border-purple-800/60'
                             : 'bg-zinc-800 text-zinc-400'
                         }`}
                       >
@@ -888,9 +890,17 @@ export default function SessionWorkspacePage() {
                 <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/50 space-y-1.5">
                   <div className="flex items-center justify-between text-[11px] text-zinc-400">
                     <span className="font-semibold text-zinc-300 uppercase tracking-wide font-mono">
-                      Detected Question
+                      {activeQuestion.question_type === 'conversation' ? 'Discussion Point / Scenario' : 'Detected Question'}
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+                    <span
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                        activeQuestion.question_type === 'conversation'
+                          ? 'bg-purple-950/70 text-purple-300 border-purple-800/60'
+                          : activeQuestion.question_type === 'screen'
+                          ? 'bg-cyan-950/70 text-cyan-300 border-cyan-800/60'
+                          : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                      }`}
+                    >
                       {activeQuestion.question_type}
                     </span>
                   </div>

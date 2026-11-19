@@ -24,6 +24,7 @@ class SettingsResponse(BaseModel):
     theme: str
     retention_days: Optional[int] = None
     structured_output: bool = True
+    conversation_mode: bool = True
     target_role: str = ""
     custom_instructions: str = ""
     few_shot_examples: List[FewShotExample] = []
@@ -41,6 +42,7 @@ class SettingsUpdate(BaseModel):
     theme: Optional[str] = None
     retention_days: Optional[int] = None
     structured_output: Optional[bool] = None
+    conversation_mode: Optional[bool] = None
     target_role: Optional[str] = Field(default=None, max_length=200)
     custom_instructions: Optional[str] = Field(default=None, max_length=3000)
     few_shot_examples: Optional[List[FewShotExample]] = Field(default=None, max_length=10)

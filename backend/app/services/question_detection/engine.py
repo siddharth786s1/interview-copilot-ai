@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from typing import Deque, List, Optional, Tuple
 
 from app.services.question_detection.patterns import (
+    CONVERSATION_CUE_PATTERNS,
     DIRECT_QUESTION_STARTERS,
     FOLLOWUP_PATTERNS,
     FRAGMENT_ONLY_PATTERNS,
@@ -98,11 +99,13 @@ class QuestionDetectionEngine:
         fragment_timeout_seconds: float = 8.0,
         dedup_window_seconds: float = 300.0,
         dedup_similarity_threshold: float = 0.80,
+        conversation_mode: bool = False,
     ):
         self.session_id = session_id
         self.fragment_timeout_seconds = fragment_timeout_seconds
         self.dedup_window_seconds = dedup_window_seconds
         self.dedup_similarity_threshold = dedup_similarity_threshold
+        self.conversation_mode = conversation_mode
 
         # Conversation history: (source, text, timestamp_mono)
         self._history: Deque[Tuple[str, str, float]] = deque(maxlen=30)
@@ -112,6 +115,9 @@ class QuestionDetectionEngine:
         self._pending: dict[str, _PendingFragment] = {}
         # Measured latencies (ms)
         self.latency_samples_ms: List[float] = []
+
+    def set_conversation_mode(self, enabled: bool) -> None:
+        self.conversation_mode = bool(enabled)
 
     def _is_small_talk(self, text: str) -> bool:
         stripped = text.strip()
@@ -156,10 +162,33 @@ class QuestionDetectionEngine:
                 return True
         return False
 
+    def _is_conversational_turn(self, text: str) -> bool:
+        """
+        Return True when conversation_mode is enabled and the interviewer delivers
+        a substantive statement, scenario, constraint, objection, or topic pivot
+        that warrants a conversational copilot reply (not small talk).
+        """
+        if not self.conversation_mode:
+            return False
+        stripped = text.strip()
+        words = _normalize(stripped).split()
+        if len(words) < 5:
+            return False
+        if self._is_small_talk(stripped):
+            return False
+        if any(p.search(stripped) for p in CONVERSATION_CUE_PATTERNS):
+            return True
+        if len(words) >= 7 and self._has_technical_keyword(stripped):
+            return True
+        # Active multi-turn discussion: substantive statement (8+ words) once dialogue has begun
+        if len(words) >= 8 and (len(self._history) >= 2 or len(self._recent_questions) >= 1):
+            return True
+        return False
+
     def _classify_question(self, text: str) -> Optional[str]:
         """
-        Return question_type ('followup', 'technical', 'direct', 'indirect')
-        or None if text is not a question.
+        Return question_type ('followup', 'technical', 'direct', 'indirect', 'conversation')
+        or None if text should not trigger an AI reply.
         """
         stripped = text.strip()
         words = _normalize(stripped).split()
@@ -175,6 +204,8 @@ class QuestionDetectionEngine:
         is_indirect = any(p.search(stripped) for p in INDIRECT_QUESTION_PATTERNS)
 
         if not (has_qmark or is_direct or is_indirect or is_followup):
+            if self._is_conversational_turn(stripped):
+                return "conversation"
             return None
 
         if is_followup:
@@ -267,9 +298,9 @@ class QuestionDetectionEngine:
             logger.debug("Suppressed duplicate question: %s", combined_text)
             return None
 
-        # Link parent question if follow-up
+        # Link parent question if follow-up or ongoing conversation turn
         parent_id: Optional[str] = None
-        if q_type == "followup" and self._recent_questions:
+        if q_type in ("followup", "conversation") and self._recent_questions:
             parent_id = self._recent_questions[-1][0]
 
         q_id = str(uuid.uuid4())

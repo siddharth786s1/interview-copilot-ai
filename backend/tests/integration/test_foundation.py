@@ -151,6 +151,7 @@ async def test_settings_get_creates_defaults(client):
     assert body["stt_provider"] == "whisper"
     assert body["llm_provider"] == "gemini"
     assert body["theme"] == "dark"
+    assert body["conversation_mode"] is True
 
 
 @pytest.mark.asyncio
@@ -158,8 +159,12 @@ async def test_settings_update(client):
     # Create defaults
     await client.get("/api/settings/")
 
-    response = await client.patch("/api/settings/", json={"theme": "light", "default_answer_style": "detailed"})
+    response = await client.patch(
+        "/api/settings/",
+        json={"theme": "light", "default_answer_style": "detailed", "conversation_mode": False},
+    )
     assert response.status_code == 200
     body = response.json()
     assert body["theme"] == "light"
     assert body["default_answer_style"] == "detailed"
+    assert body["conversation_mode"] is False

@@ -62,6 +62,7 @@ class SessionConnectionManager:
         self.llm_provider_factory: Callable[[Optional[str], Optional[str]], LLMProvider] = get_llm_provider
         self.db_session_factory = AsyncSessionLocal
         self.auto_generate_answers: bool = True
+        self._conversation_mode: bool = True
 
     def set_screen_context(self, session_id: str, summary: str) -> None:
         cleaned = summary.strip()
@@ -125,8 +126,18 @@ class SessionConnectionManager:
 
     def get_or_create_question_engine(self, session_id: str) -> QuestionDetectionEngine:
         if session_id not in self._question_engines:
-            self._question_engines[session_id] = QuestionDetectionEngine(session_id=session_id)
+            self._question_engines[session_id] = QuestionDetectionEngine(
+                session_id=session_id,
+                conversation_mode=self._conversation_mode,
+            )
         return self._question_engines[session_id]
+
+    def set_conversation_mode_all(self, enabled: bool) -> None:
+        """Update conversation_mode across all active engines and future engines."""
+        self._conversation_mode = bool(enabled)
+        for engine in self._question_engines.values():
+            engine.set_conversation_mode(self._conversation_mode)
+        logger.info("Updated conversation_mode=%s on %d active engines", self._conversation_mode, len(self._question_engines))
 
     def _register_answer_task(self, session_id: str, task: asyncio.Task) -> None:
         tasks = self._answer_tasks.setdefault(session_id, set())

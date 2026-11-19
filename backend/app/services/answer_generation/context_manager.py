@@ -291,8 +291,12 @@ class ContextManager:
             coaching_block += f"\nCANDIDATE COACHING INSTRUCTIONS (FOLLOW CLOSELY):\n{ctx.custom_instructions}"
 
         system_prompt = (
-            f"You are Interview Copilot AI, a personal real-time interview preparation assistant "
-            f"supporting a candidate during a {ctx.session_type.upper()} interview.\n\n"
+            f"You are Interview Copilot AI, a personal real-time interview co-pilot and coach "
+            f"supporting a candidate during a {ctx.session_type.upper()} interview.\n"
+            f"You continuously analyze the live conversation, technical context, and ongoing dialogue. "
+            f"When the interviewer presents a technical scenario, architecture challenge, constraint, "
+            f"objection, system requirement, or discussion point (even without asking a formal question), "
+            f"you immediately provide the candidate with a reliable, structured, high-signal response to speak aloud.\n\n"
             f"{grounding_rules}\n"
             f"{style_rule}\n\n"
             f"{depth_rule}"
@@ -358,10 +362,17 @@ class ContextManager:
         if ctx.expand_previous_answer:
             sections.append(
                 "### TASK: EXPAND EXISTING ANSWER\n"
-                f"Question: {ctx.question}\n"
+                f"Topic / Question: {ctx.question}\n"
                 f"Previous Answer:\n{ctx.expand_previous_answer}\n\n"
                 "Expand on the previous answer with deeper technical detail, a concrete example, "
                 "and any important edge cases or follow-up talking points."
+            )
+        elif ctx.question_type == "conversation":
+            sections.append(
+                "### INTERVIEWER DISCUSSION POINT / TECHNICAL SCENARIO\n"
+                f"{ctx.question}\n\n"
+                "The interviewer shared this technical scenario, system constraint, or discussion point during the ongoing conversation. "
+                "Provide an immediate, reliable, structured response the candidate can speak to directly address this scenario, trade-offs, and recommended technical approach."
             )
         else:
             sections.append(

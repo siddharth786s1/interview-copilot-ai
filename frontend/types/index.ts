@@ -44,6 +44,7 @@ export interface AppSettings {
   default_answer_style: 'short' | 'detailed' | 'practical' | 'stepbystep';
   default_technical_depth: 'low' | 'medium' | 'high';
   structured_output: boolean;
+  conversation_mode: boolean;
   target_role: string;
   custom_instructions: string;
   few_shot_examples: FewShotExample[];
@@ -67,7 +68,7 @@ export interface DetectedQuestion {
   id: string;
   session_id: string;
   question_text: string;
-  question_type: 'direct' | 'indirect' | 'technical' | 'followup' | 'manual' | 'screen';
+  question_type: 'direct' | 'indirect' | 'technical' | 'followup' | 'manual' | 'screen' | 'conversation';
   detected_at: string;
   answered: boolean;
 }

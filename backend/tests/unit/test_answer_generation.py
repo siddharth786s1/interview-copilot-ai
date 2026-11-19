@@ -250,3 +250,25 @@ def test_keyword_extraction():
     assert "authorization" in lower_kws
     assert "jwt" in lower_kws
     assert "oauth" in lower_kws
+
+
+def test_conversation_scenario_prompt_formatting():
+    cm = ContextManager()
+    ctx = AnswerContext(
+        session_id="s-conv-prompt",
+        question_id="q-conv-1",
+        question="In our architecture, we cannot use two-phase commit across microservices.",
+        question_type="conversation",
+        session_type="technical",
+        style="short",
+        technical_depth="high",
+        target_role="Staff Distributed Systems Architect",
+        custom_instructions="Focus on the Saga pattern, outbox pattern, and idempotency keys.",
+    )
+    system_prompt, user_prompt = cm.build_prompts(ctx)
+    assert "co-pilot and coach" in system_prompt
+    assert "live conversation" in system_prompt
+    assert "TARGET CANDIDATE ROLE: Staff Distributed Systems Architect" in system_prompt
+    assert "Saga pattern" in system_prompt
+    assert "### INTERVIEWER DISCUSSION POINT / TECHNICAL SCENARIO" in user_prompt
+    assert "In our architecture, we cannot use two-phase commit across microservices." in user_prompt

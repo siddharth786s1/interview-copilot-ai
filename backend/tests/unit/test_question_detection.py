@@ -154,3 +154,38 @@ def test_manual_question_registration_enables_followup():
     assert followup is not None
     assert followup.question_type == "followup"
     assert followup.parent_question_id == "q-manual-1"
+
+
+def test_conversational_scenario_detected_when_conversation_mode_enabled():
+    engine = QuestionDetectionEngine(session_id="s-conv-1", conversation_mode=True)
+    scenarios = [
+        "Imagine we are seeing high memory consumption in our Redis cluster under load.",
+        "In our architecture, we cannot use two-phase commit across microservices.",
+        "Let's switch to system design and talk about rate limiting 100k requests per second.",
+        "The problem is that our PostgreSQL read replicas have high replication lag during peak hours.",
+    ]
+    for idx, text in enumerate(scenarios):
+        event = engine.process_segment(text, source="tab", now_mono=200.0 + idx * 10.0)
+        assert event is not None, f"Expected conversational detection for: {text}"
+        assert event.question_type == "conversation"
+        assert event.question_text == text
+
+
+def test_conversational_mode_disabled_ignores_non_questions():
+    engine = QuestionDetectionEngine(session_id="s-conv-off", conversation_mode=False)
+    non_q = "In our architecture, we cannot use two-phase commit across microservices."
+    event = engine.process_segment(non_q, source="tab", now_mono=10.0)
+    assert event is None, "Non-question should not be detected when conversation_mode is False"
+
+
+def test_conversational_mode_still_suppresses_small_talk():
+    engine = QuestionDetectionEngine(session_id="s-conv-suppress", conversation_mode=True)
+    small_talk = [
+        "Okay, sounds good.",
+        "Can you hear me?",
+        "Thank you for joining.",
+        "Nice to meet you.",
+    ]
+    for idx, text in enumerate(small_talk):
+        event = engine.process_segment(text, source="tab", now_mono=300.0 + idx * 5.0)
+        assert event is None, f"Small talk should remain suppressed in conversation_mode: {text}"
