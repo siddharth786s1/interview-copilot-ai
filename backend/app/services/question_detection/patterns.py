@@ -55,6 +55,8 @@ TECHNICAL_KEYWORDS = {
     "async", "thread", "deadlock", "algorithm", "complexity", "data structure",
     "system design", "architecture", "load balancer", "kafka", "queue", "rbac", "abac",
     "t-code", "pfcg", "su53", "role", "roles", "profile", "segregation of duties", "sod",
+    # Common Devanagari technical terms
+    "ऑथेंटिकेशन", "ऑथराइजेशन", "डेटाबेस", "माइक्रोसर्विसेज", "एसक्यूएल", "रेडिस", "सिक्योरिटी", "आर्किटेक्चर", "कैशिंग",
 }
 
 # Incomplete fragment patterns (should be buffered and merged with next segment)
@@ -79,4 +81,51 @@ CONVERSATION_CUE_PATTERNS = [
     re.compile(r"\b(i'?m not sure (that|if|whether)|that might not|wouldn'?t that|doesn'?t that|my concern is)\b", re.I),
     re.compile(r"\b(let'?s (move on to|switch to|dive into|focus on|look at|design|build|debug|solve))\b", re.I),
     re.compile(r"\b(your thoughts on|i'?d love to hear|curious to hear|interesting[,\s]+we)\b", re.I),
+]
+
+# Bilingual (Hindi / Hinglish) Small Talk Patterns
+HINDI_SMALL_TALK_PATTERNS = [
+    re.compile(r"^(theek hai|thik hai|theek h|dhanyawad|shukriya|haan ji|hanji|achha|accha|sahi hai|bahut badhiya)[.!?\s,]*$", re.I),
+    re.compile(r"\b(aap sun sakte ho|meri awaz aa rahi hai|sun pa rahe ho|kya aap sun sakte ho|audio clear hai|awaz aa rahi hai)\b", re.I),
+    re.compile(r"^(ठीक है|धन्यवाद|शुक्रिया|हाँजी|हाँ जी|अच्छा|बहुत बढ़िया)[.!?\s,]*$", re.I),
+    re.compile(r"\b(क्या आप सुन सकते हैं|मेरी आवाज़ आ रही है|आवाज़ साफ है|सुन पा रहे हैं)\b", re.I),
+]
+
+# Bilingual (Hindi / Hinglish) Direct Question Starters & Endings
+HINGLISH_DIRECT_QUESTION_PATTERNS = [
+    re.compile(r"^(so\s+|aur\s+|to\s+|accha\s+)?(kya (aap|tum|hum|ye)|kaise (karenge|hota|hoga|kare|handle|solve)|kyun (use|karna)|kab (kare|hota))\b", re.I),
+    re.compile(r"\b(kya hai|kya hoga|kaise kaam karta hai|kaise kare|bata sakte ho|bata sakti ho)\??$", re.I),
+]
+
+HINDI_DIRECT_QUESTION_PATTERNS = [
+    re.compile(r"^(तो\s+|और\s+)?(क्या|कैसे|क्यों|कब|कहाँ|किस|कौन)\b", re.I),
+    re.compile(r"(क्या है|कैसे काम करता है|समझा सकते हैं|बता सकते हैं)\??$", re.I),
+]
+
+# Bilingual (Hindi / Hinglish) Indirect & Imperative Prompts
+HINGLISH_INDIRECT_QUESTION_PATTERNS = [
+    re.compile(r"\b(explain karo|elaborate karo|batao|bataiye|samjhao|describe karo|walkthrough do|share karo|discuss karo)\b", re.I),
+    re.compile(r"\b(aapka (experience|approach|view|background|take|project)|apna (experience|project))\b", re.I),
+    re.compile(r"\b(mujhe (janna hai|bataiye|samjhaiye)|humein (bataiye|samjhaiye))\b", re.I),
+]
+
+HINDI_INDIRECT_QUESTION_PATTERNS = [
+    re.compile(r"\b(समझाओ|बताइए|बताओ|विवरण दें|का क्या मतलब है|अंतर क्या है|के बारे में बताइए)\b", re.I),
+    re.compile(r"\b(आपका अनुभव|अपने प्रोजेक्ट के बारे में|हमें बताइए|मुझे जानना है)\b", re.I),
+]
+
+# Bilingual (Hindi / Hinglish) Conversational Scenarios & Constraints
+HINGLISH_CONVERSATION_CUE_PATTERNS = [
+    re.compile(r"\b(maan lijiye|suppose karo|assume karo|sochiye ki)\b", re.I),
+    re.compile(r"\b(agar hamare (system|server|architecture|database|codebase|team) mein)\b", re.I),
+    re.compile(r"\b(problem yeh hai ki|issue yeh aa raha hai|dikkatt yeh hai ki|catch yeh hai ki)\b", re.I),
+    re.compile(r"\b(hum (use nahi kar sakte|cannot use|dekh rahe hain|chahte hain ki|facing an issue))\b", re.I),
+    re.compile(r"\b(latency badh rahi hai|memory full ho rahi hai|deadlocks aa rahe hain|outage hua tha)\b", re.I),
+]
+
+HINDI_CONVERSATION_CUE_PATTERNS = [
+    re.compile(r"\b(मान लीजिए|सोचिए कि|मान लें)\b", re.I),
+    re.compile(r"\b(अगर हमारे (सिस्टम|सर्वर|डेटाबेस|आर्किटेक्चर) में)\b", re.I),
+    re.compile(r"\b(समस्या यह है कि|दिक्कत यह है कि|चुनौती यह है कि)\b", re.I),
+    re.compile(r"\b(हम उपयोग नहीं कर सकते|हम देख रहे हैं कि)\b", re.I),
 ]

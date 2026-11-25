@@ -17,6 +17,13 @@ from app.services.question_detection.patterns import (
     DIRECT_QUESTION_STARTERS,
     FOLLOWUP_PATTERNS,
     FRAGMENT_ONLY_PATTERNS,
+    HINDI_CONVERSATION_CUE_PATTERNS,
+    HINDI_DIRECT_QUESTION_PATTERNS,
+    HINDI_INDIRECT_QUESTION_PATTERNS,
+    HINDI_SMALL_TALK_PATTERNS,
+    HINGLISH_CONVERSATION_CUE_PATTERNS,
+    HINGLISH_DIRECT_QUESTION_PATTERNS,
+    HINGLISH_INDIRECT_QUESTION_PATTERNS,
     INCOMPLETE_ENDINGS,
     INDIRECT_QUESTION_PATTERNS,
     SMALL_TALK_PATTERNS,
@@ -126,6 +133,9 @@ class QuestionDetectionEngine:
         for pat in SMALL_TALK_PATTERNS:
             if pat.search(stripped):
                 return True
+        for pat in HINDI_SMALL_TALK_PATTERNS:
+            if pat.search(stripped):
+                return True
         return False
 
     def _is_incomplete_fragment(self, text: str) -> bool:
@@ -176,7 +186,11 @@ class QuestionDetectionEngine:
             return False
         if self._is_small_talk(stripped):
             return False
-        if any(p.search(stripped) for p in CONVERSATION_CUE_PATTERNS):
+        if (
+            any(p.search(stripped) for p in CONVERSATION_CUE_PATTERNS)
+            or any(p.search(stripped) for p in HINGLISH_CONVERSATION_CUE_PATTERNS)
+            or any(p.search(stripped) for p in HINDI_CONVERSATION_CUE_PATTERNS)
+        ):
             return True
         if len(words) >= 7 and self._has_technical_keyword(stripped):
             return True
@@ -200,8 +214,16 @@ class QuestionDetectionEngine:
 
         is_followup = self._is_followup(stripped)
         has_qmark = stripped.endswith("?")
-        is_direct = bool(DIRECT_QUESTION_STARTERS.match(stripped))
-        is_indirect = any(p.search(stripped) for p in INDIRECT_QUESTION_PATTERNS)
+        is_direct = bool(
+            DIRECT_QUESTION_STARTERS.match(stripped)
+            or any(p.search(stripped) for p in HINGLISH_DIRECT_QUESTION_PATTERNS)
+            or any(p.search(stripped) for p in HINDI_DIRECT_QUESTION_PATTERNS)
+        )
+        is_indirect = (
+            any(p.search(stripped) for p in INDIRECT_QUESTION_PATTERNS)
+            or any(p.search(stripped) for p in HINGLISH_INDIRECT_QUESTION_PATTERNS)
+            or any(p.search(stripped) for p in HINDI_INDIRECT_QUESTION_PATTERNS)
+        )
 
         if not (has_qmark or is_direct or is_indirect or is_followup):
             if self._is_conversational_turn(stripped):

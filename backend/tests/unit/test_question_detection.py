@@ -189,3 +189,26 @@ def test_conversational_mode_still_suppresses_small_talk():
     for idx, text in enumerate(small_talk):
         event = engine.process_segment(text, source="tab", now_mono=300.0 + idx * 5.0)
         assert event is None, f"Small talk should remain suppressed in conversation_mode: {text}"
+
+
+def test_hinglish_and_devanagari_question_detection():
+    engine = QuestionDetectionEngine(session_id="s-bilingual-test", conversation_mode=True)
+    samples = [
+        ("Aapka previous project explain karo.", "indirect"),
+        ("Kya aap authentication aur authorization mein difference bata sakte ho?", "technical"),
+        ("क्या आप ऑथेंटिकेशन और ऑथराइजेशन में अंतर समझा सकते हैं?", "technical"),
+        ("Maan lijiye hamare system mein Redis high memory le raha hai.", "conversation"),
+        ("Problem yeh hai ki database deadlocks aa rahe hain flash sales ke time.", "conversation"),
+    ]
+    for idx, (text, expected_type) in enumerate(samples):
+        ev = engine.process_segment(text, source="tab", now_mono=400.0 + idx * 10.0)
+        assert ev is not None, f"Failed to detect: {text}"
+        assert ev.question_type == expected_type, f"Expected {expected_type} but got {ev.question_type} for {text}"
+
+
+def test_hindi_small_talk_suppression():
+    engine = QuestionDetectionEngine(session_id="s-hindi-smalltalk", conversation_mode=True)
+    small_talk = ["Theek hai", "Dhanyawad", "Haan ji", "Aap sun sakte ho?", "Bahut badhiya"]
+    for idx, text in enumerate(small_talk):
+        ev = engine.process_segment(text, source="tab", now_mono=500.0 + idx * 5.0)
+        assert ev is None, f"Small talk should be suppressed: {text}"
