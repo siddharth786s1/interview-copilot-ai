@@ -46,6 +46,8 @@ class AnswerContext:
     target_role: str = ""
     custom_instructions: str = ""
     few_shot_examples: List[Dict[str, str]] = field(default_factory=list)
+    active_learning_paradigms: List[str] = field(default_factory=list)
+    session_learnings_prompt: str = ""
     screen_context: Optional[str] = None
 
 

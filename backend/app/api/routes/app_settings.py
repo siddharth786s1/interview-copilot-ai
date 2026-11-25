@@ -32,6 +32,19 @@ def _parse_examples(raw: str | None) -> List[FewShotExample]:
         return []
 
 
+def _parse_paradigms(raw: str | None) -> List[str]:
+    default_paradigms = ["system_design", "incident_debugging", "behavioral_star", "pushback_handling", "bilingual_hinglish"]
+    if not raw:
+        return default_paradigms
+    try:
+        items = json.loads(raw)
+        if isinstance(items, list) and all(isinstance(x, str) for x in items):
+            return items
+        return default_paradigms
+    except Exception:
+        return default_paradigms
+
+
 def _to_response(row: AppSettings) -> SettingsResponse:
     return SettingsResponse(
         id=row.id,
@@ -49,6 +62,7 @@ def _to_response(row: AppSettings) -> SettingsResponse:
         target_role=row.target_role or "",
         custom_instructions=row.custom_instructions or "",
         few_shot_examples=_parse_examples(row.few_shot_examples),
+        active_learning_paradigms=_parse_paradigms(row.active_learning_paradigms),
         updated_at=row.updated_at,
     )
 
@@ -78,6 +92,9 @@ async def update_settings(payload: SettingsUpdate, db: AsyncSession = Depends(ge
         if field == "few_shot_examples":
             serialized = json.dumps([ex if isinstance(ex, dict) else ex.model_dump() for ex in (value or [])])
             settings_row.few_shot_examples = serialized
+        elif field == "active_learning_paradigms":
+            serialized = json.dumps([str(x) for x in (value or [])])
+            settings_row.active_learning_paradigms = serialized
         else:
             setattr(settings_row, field, value)
     settings_row.updated_at = datetime.now(timezone.utc)

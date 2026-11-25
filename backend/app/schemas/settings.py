@@ -28,6 +28,13 @@ class SettingsResponse(BaseModel):
     target_role: str = ""
     custom_instructions: str = ""
     few_shot_examples: List[FewShotExample] = []
+    active_learning_paradigms: List[str] = [
+        "system_design",
+        "incident_debugging",
+        "behavioral_star",
+        "pushback_handling",
+        "bilingual_hinglish",
+    ]
     updated_at: datetime
 
 
@@ -46,3 +53,4 @@ class SettingsUpdate(BaseModel):
     target_role: Optional[str] = Field(default=None, max_length=200)
     custom_instructions: Optional[str] = Field(default=None, max_length=3000)
     few_shot_examples: Optional[List[FewShotExample]] = Field(default=None, max_length=10)
+    active_learning_paradigms: Optional[List[str]] = Field(default=None, max_length=10)

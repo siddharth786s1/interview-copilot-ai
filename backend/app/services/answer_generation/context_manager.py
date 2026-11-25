@@ -18,6 +18,8 @@ from app.models.session import (
 )
 from app.models.settings import AppSettings
 from app.services.answer_generation.base import AnswerContext
+from app.services.answer_generation.learning_paradigms import get_learning_exemplars
+from app.services.answer_generation.session_learner import SessionLearner
 
 PERSONAL_BACKGROUND_PATTERNS = [
     re.compile(r"\b(tell me about yourself|introduce yourself|your background|walk me through your resume)\b", re.I),
@@ -88,6 +90,7 @@ class ContextManager:
         self.transcript_window = transcript_window
         self.qa_window = qa_window
         self.kb_top_k = kb_top_k
+        self.session_learner = SessionLearner()
 
     async def build_context(
         self,
@@ -208,6 +211,19 @@ class ContextManager:
             is_personal_background_question(question_text) and resume_summary is None
         )
 
+        raw_paradigms = _safe_json_loads(app_cfg.active_learning_paradigms) if app_cfg and app_cfg.active_learning_paradigms else None
+        active_learning_paradigms = (
+            [str(x) for x in raw_paradigms if isinstance(x, str)]
+            if isinstance(raw_paradigms, list)
+            else ["system_design", "incident_debugging", "behavioral_star", "pushback_handling", "bilingual_hinglish"]
+        )
+
+        session_learnings = self.session_learner.extract_session_learnings(recent_transcript, prior_qa)
+        session_learnings_prompt = session_learnings.to_prompt_section()
+
+        learning_exemplars = get_learning_exemplars(active_learning_paradigms)
+        combined_few_shot = (few_shot_examples or []) + (learning_exemplars or [])
+
         return AnswerContext(
             session_id=session_id,
             question_id=question_id,
@@ -225,7 +241,9 @@ class ContextManager:
             structured_output=structured_output,
             target_role=target_role,
             custom_instructions=custom_instructions,
-            few_shot_examples=few_shot_examples,
+            few_shot_examples=combined_few_shot,
+            active_learning_paradigms=active_learning_paradigms,
+            session_learnings_prompt=session_learnings_prompt,
             screen_context=screen_context,
         )
 
@@ -290,6 +308,13 @@ class ContextManager:
         if ctx.custom_instructions:
             coaching_block += f"\nCANDIDATE COACHING INSTRUCTIONS (FOLLOW CLOSELY):\n{ctx.custom_instructions}"
 
+        bilingual_rules = (
+            "BILINGUAL & HINGLISH INTERVIEW RULES:\n"
+            "1. If the interviewer speaks in English, generate the response in clear, professional, structured English.\n"
+            "2. If the interviewer speaks in Hindi or Hinglish (e.g. 'explain karo', 'maan lijiye', 'kaise solve karoge', or Devanagari), generate the response in fluent bilingual technical Hinglish.\n"
+            "3. Core engineering terms, architecture patterns, metric names, protocols, and code must ALWAYS remain in standard English (e.g., 'LRU cache', 'read replica', 'circuit breaker', 'Kafka topic')."
+        )
+
         system_prompt = (
             f"You are Interview Copilot AI, a personal real-time interview co-pilot and coach "
             f"supporting a candidate during a {ctx.session_type.upper()} interview.\n"
@@ -298,6 +323,7 @@ class ContextManager:
             f"objection, system requirement, or discussion point (even without asking a formal question), "
             f"you immediately provide the candidate with a reliable, structured, high-signal response to speak aloud.\n\n"
             f"{grounding_rules}\n"
+            f"{bilingual_rules}\n\n"
             f"{style_rule}\n\n"
             f"{depth_rule}"
             f"{structure_block}"
@@ -306,10 +332,13 @@ class ContextManager:
 
         sections: List[str] = []
 
+        if ctx.session_learnings_prompt:
+            sections.append(ctx.session_learnings_prompt)
+
         if ctx.few_shot_examples:
             ex_lines = [
                 f"Example {i + 1}:\nQ: {ex['question']}\nIdeal Answer:\n{ex['ideal_answer']}"
-                for i, ex in enumerate(ctx.few_shot_examples[:5])
+                for i, ex in enumerate(ctx.few_shot_examples[:7])
             ]
             sections.append(
                 "### CANDIDATE PREFERRED ANSWER EXAMPLES (MATCH THIS STRUCTURE & TONE)\n"

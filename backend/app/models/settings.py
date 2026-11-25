@@ -32,4 +32,5 @@ class AppSettings(SQLModel, table=True):
     target_role: str = Field(default="")
     custom_instructions: str = Field(default="", sa_column=Column(Text))
     few_shot_examples: Optional[str] = Field(default=None, sa_column=Column(Text))  # JSON list[{question, ideal_answer}]
+    active_learning_paradigms: Optional[str] = Field(default=None, sa_column=Column(Text))  # JSON list of active paradigms
     updated_at: datetime = Field(default_factory=_utcnow)

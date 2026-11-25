@@ -51,6 +51,7 @@ async def init_db() -> None:
             ("target_role", "VARCHAR NOT NULL DEFAULT ''"),
             ("custom_instructions", "TEXT NOT NULL DEFAULT ''"),
             ("few_shot_examples", "TEXT"),
+            ("active_learning_paradigms", "TEXT"),
         ]
         for col_name, col_ddl in additive_columns:
             if col_name not in existing_cols:

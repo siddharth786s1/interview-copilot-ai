@@ -272,3 +272,28 @@ def test_conversation_scenario_prompt_formatting():
     assert "Saga pattern" in system_prompt
     assert "### INTERVIEWER DISCUSSION POINT / TECHNICAL SCENARIO" in user_prompt
     assert "In our architecture, we cannot use two-phase commit across microservices." in user_prompt
+
+
+def test_context_manager_injects_dynamic_session_learnings_and_paradigms():
+    cm = ContextManager()
+    ctx = AnswerContext(
+        session_id="s-learn-test",
+        question_id="q-learn-1",
+        question="Aapka previous project explain karo aur database architecture discuss karo.",
+        question_type="conversation",
+        session_type="technical",
+        recent_transcript=[
+            {"speaker": "Interviewer", "text": "Hamare paas high-volume write traffic hai aur PostgreSQL use kar rahe hain."},
+            {"speaker": "Interviewer", "text": "Latency SLA under 50ms strictly required hai."},
+        ],
+        prior_qa=[],
+        session_learnings_prompt="### DYNAMIC CONVERSATION MEMORY & LEARNED CONSTRAINTS\n- Detected Dialogue Style: Hinglish\n- Established Session Constraints:\n  * Latency SLA under 50ms strictly required",
+        few_shot_examples=[
+            {"question": "Sample Q?", "ideal_answer": "**Direct Answer**\nSample A."}
+        ],
+    )
+    system_prompt, user_prompt = cm.build_prompts(ctx)
+    assert "BILINGUAL & HINGLISH INTERVIEW RULES" in system_prompt
+    assert "### DYNAMIC CONVERSATION MEMORY & LEARNED CONSTRAINTS" in user_prompt
+    assert "Latency SLA under 50ms strictly required" in user_prompt
+    assert "### CANDIDATE PREFERRED ANSWER EXAMPLES" in user_prompt
