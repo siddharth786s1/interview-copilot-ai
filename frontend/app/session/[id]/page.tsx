@@ -572,12 +572,18 @@ export default function SessionWorkspacePage() {
               className="bg-zinc-900 border border-zinc-800 rounded px-2 py-0.5 text-[11px] text-zinc-300 focus:outline-none focus:border-emerald-500"
             >
               <option value="en">English (en)</option>
+              <option value="bilingual_hi_en">Bilingual (Hindi + English)</option>
               <option value="auto">Auto-detect</option>
               <option value="es">Spanish (es)</option>
               <option value="fr">French (fr)</option>
               <option value="de">German (de)</option>
               <option value="hi">Hindi (hi)</option>
             </select>
+            {language === 'bilingual_hi_en' && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-950/70 text-indigo-300 border border-indigo-800/60 font-mono">
+                Hinglish Mirror
+              </span>
+            )}
           </div>
 
           <span>•</span>

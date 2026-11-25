@@ -48,6 +48,7 @@ export interface AppSettings {
   target_role: string;
   custom_instructions: string;
   few_shot_examples: FewShotExample[];
+  active_learning_paradigms?: string[];
   theme: 'dark' | 'light';
   retention_days: number | null;
   updated_at: string;

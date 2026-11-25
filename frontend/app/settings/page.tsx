@@ -259,6 +259,59 @@ export default function SettingsPage() {
               />
             </div>
 
+            {/* Multi-Paradigm Few-Shot Learning Modules */}
+            <div className="space-y-3 pt-2 border-t border-zinc-800">
+              <div>
+                <label className="block text-xs font-medium text-zinc-300">
+                  Multi-Paradigm In-Context Training Modules
+                </label>
+                <p className="text-[11px] text-zinc-500">
+                  Select which interview learning paradigms are continuously injected into Gemini&apos;s prompt for optimal answer framing.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                {[
+                  { id: 'system_design', label: 'System Design & Trade-offs', desc: 'Caching, scale, resilience, eviction' },
+                  { id: 'incident_debugging', label: 'Incident & Performance Debugging', desc: 'I/O wait, latency p99, thread dumps' },
+                  { id: 'behavioral_star', label: 'Behavioral STAR with Metrics', desc: 'Quantified impact, conflict resolution' },
+                  { id: 'pushback_handling', label: 'Handling Interviewer Pushback', desc: 'Defending trade-offs constructively' },
+                  { id: 'bilingual_hinglish', label: 'Bilingual / Hinglish Dialogue', desc: 'Natural Hindi-English tech mirroring' },
+                ].map((mod) => {
+                  const currentParadigms = settings.active_learning_paradigms || [
+                    'system_design', 'incident_debugging', 'behavioral_star', 'pushback_handling', 'bilingual_hinglish'
+                  ];
+                  const isChecked = currentParadigms.includes(mod.id);
+                  return (
+                    <label
+                      key={mod.id}
+                      className={`flex items-start gap-2.5 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        isChecked
+                          ? 'border-emerald-800/60 bg-emerald-950/20 text-zinc-200'
+                          : 'border-zinc-800 bg-zinc-950/40 text-zinc-400 hover:border-zinc-700'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          const updated = e.target.checked
+                            ? [...currentParadigms, mod.id]
+                            : currentParadigms.filter((p) => p !== mod.id);
+                          setSettings({ ...settings, active_learning_paradigms: updated });
+                        }}
+                        className="accent-emerald-500 h-3.5 w-3.5 mt-0.5"
+                      />
+                      <div>
+                        <span className="font-medium block text-zinc-200">{mod.label}</span>
+                        <span className="text-[10px] text-zinc-500">{mod.desc}</span>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Few-Shot Example Q&A Pairs */}
             <div className="space-y-3 pt-1">
               <div className="flex items-center justify-between">
@@ -341,6 +394,7 @@ export default function SettingsPage() {
                 className="w-full px-3 py-2 text-sm bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 focus:outline-none focus:border-emerald-500"
               >
                 <option value="en">English (en)</option>
+                <option value="bilingual_hi_en">Bilingual: Hindi + English (Hinglish)</option>
                 <option value="auto">Auto-detect</option>
                 <option value="es">Spanish (es)</option>
                 <option value="fr">French (fr)</option>
