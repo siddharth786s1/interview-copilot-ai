@@ -205,3 +205,20 @@ async def test_pause_and_language_config():
     assert len(flushed) == 1
     assert flushed[0].language == "es"
     assert stt.calls[0]["language"] == "es"
+
+
+@pytest.mark.asyncio
+async def test_bilingual_language_config():
+    stt = FakeSTTProvider(["Aapka previous project explain karo."])
+    tm = TranscriptManager(session_id="s-bi", stt_provider=stt, language="bilingual_hi_en")
+    assert tm.language == "bilingual_hi_en"
+    tm.set_language("hi")
+    assert tm.language == "hi"
+    tm.set_language("bilingual_hi_en")
+    assert tm.language == "bilingual_hi_en"
+
+    await tm.process_audio_chunk("tab", make_sine_pcm(0.5))
+    flushed = await tm.flush("tab")
+    assert len(flushed) == 1
+    assert flushed[0].language == "bilingual_hi_en"
+    assert stt.calls[0]["language"] == "bilingual_hi_en"

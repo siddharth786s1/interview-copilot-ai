@@ -98,7 +98,7 @@ class WhisperProvider(SpeechToTextProvider):
         audio_np = np.frombuffer(audio_pcm[:usable_len], dtype=np.int16).astype(np.float32) / 32768.0
 
         model = self._get_model()
-        lang_arg = None if (not language or language == "auto") else language
+        lang_arg = None if (not language or language in ("auto", "bilingual_hi_en")) else language
 
         segments, info = model.transcribe(
             audio_np,

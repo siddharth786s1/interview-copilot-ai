@@ -50,7 +50,7 @@ class DeepgramProvider(SpeechToTextProvider):
             "punctuate": "true",
             "smart_format": "true",
         }
-        if language and language != "auto":
+        if language and language not in ("auto", "bilingual_hi_en"):
             params["language"] = language
         else:
             params["detect_language"] = "true"
